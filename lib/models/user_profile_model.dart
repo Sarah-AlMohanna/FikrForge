@@ -10,6 +10,8 @@ String userProfileToJson(UserProfile data) => json.encode(data.toJson());
 
 class UserProfile {
   final String? fillName;
+  final String? profileImage;
+  final String? bio;
   final String? userName;
   final String? email;
   final String? phoneNumber;
@@ -23,7 +25,9 @@ class UserProfile {
 
   UserProfile({
     this.fillName,
+    this.profileImage,
     this.userName,
+    this.bio,
     this.email,
     this.phoneNumber,
     this.countryId,
@@ -37,7 +41,9 @@ class UserProfile {
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
     fillName: json["fill_name"],
+    bio: json["bio"],
     userName: json["user_name"],
+    profileImage: json["profile_image"],
     email: json["email"],
     phoneNumber: json["phone_number"],
     countryId: json["country_id"],
@@ -53,8 +59,10 @@ class UserProfile {
     "fill_name": fillName,
     "user_name": userName,
     "email": email,
+    "bio": bio,
     "phone_number": phoneNumber,
     "country_id": countryId,
+    "profile_image": profileImage,
     // "identity_number": identityNumber,
     "password": password,
     // "company_registration": companyRegistration,

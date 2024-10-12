@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forgeapp/configuration/theme.dart';
 
 Widget T9EditTextStyle(
-    var hintText, TextEditingController textEditingController, {bool isEnable = true, IconData? iconData ,TextInputType textInputType = TextInputType.text}) {
+    var hintText, TextEditingController textEditingController, {bool isEnable = true, IconData? iconData
+      , int? maxLines ,TextInputType textInputType = TextInputType.text}) {
   return Padding(
     padding:  EdgeInsets.only(right: size_W(20), left: size_W(20)),
     child: Container(
@@ -12,6 +13,8 @@ Widget T9EditTextStyle(
         // style: TextStyle(fontSize: textSizeMedium, ),
         style: ourTextStyle(fontSize: 15, ),
         controller: textEditingController,
+        maxLines: maxLines,
+
         keyboardType: textInputType,
         textInputAction: TextInputAction.next,
         /*

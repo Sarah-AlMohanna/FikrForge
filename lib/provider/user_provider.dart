@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,9 @@ class UserProvider with ChangeNotifier{
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     try {
       var userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      String jsonString = jsonEncode(userDoc.data());
+      UserProfile userProfile = userProfileFromJson(jsonString);
+      await  setUserProfile(userProfile);
       return userDoc.data();
     } catch (e) {
       print("Error retrieving user data: $e");
@@ -111,6 +115,7 @@ class UserProvider with ChangeNotifier{
       return false ;
     }
   }
+
 
 
 

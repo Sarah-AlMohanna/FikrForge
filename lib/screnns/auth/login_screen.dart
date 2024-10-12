@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -124,6 +125,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: (300),
                   child: T9ButtonReverce(
                     onPressed: () async {
+
+                      // if(kDebugMode){
+                      //   userOrEmailController.text = "user@user.com";
+                      //   password.text = "User#1234";
+                      // }
+
                       try {
                         if(userOrEmailController.text.isEmpty){
                           EasyLoading.showError("Enter email");
@@ -141,17 +148,28 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Map<String, dynamic>? userData = await getUserData(userCredential.user!.uid);
                           Map<String, dynamic>? userData = await Provider.of<UserProvider>(context , listen: false).getUserData(userCredential.user!.uid);
                           if(userData != null){
-                            log("User Data: $userData");
-                            String jsonString = jsonEncode(userData);
-                            UserProfile userProfile = userProfileFromJson(jsonString);
-                            await  Provider.of<UserProvider>(context , listen: false).setUserProfile(userProfile);
+                            // log("User Data: $userData");
+                            // String jsonString = jsonEncode(userData);
+                            // UserProfile userProfile = userProfileFromJson(jsonString);
+                            // await  Provider.of<UserProvider>(context , listen: false).setUserProfile(userProfile);
                             EasyLoading.dismiss();
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        HomePage()),
-                                    (Route<dynamic> route) => false);
+
+                            if(userData["account_type"] == "entrepreneur"){
+                              /// entrepreneur
+                              Navigator.pushReplacementNamed(context, '/homePageEntrepreneur');
+                            }else {
+                              // Navigator.pushAndRemoveUntil(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (BuildContext context) =>
+                              //             HomePage()),
+                              //         (Route<dynamic> route) => false);
+                              Navigator.pushReplacementNamed(context, '/homePage');
+
+
+                            }
+
+
                           } else{
                             EasyLoading.dismiss();
                             EasyLoading.showError("Login failed");

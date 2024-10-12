@@ -52,6 +52,7 @@ dependencies:
   url_launcher: ^6.3.0
   firebase_auth: ^4.20.0
   cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.7
 #  firebase_admin: ^0.3.0
 #  dart_jsonwebtoken: ^2.14.0
 #  googleapis_auth: ^1.4.1
