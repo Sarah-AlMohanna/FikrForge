@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:forgeapp/screnns/auth/registeredSuccessfullyPage.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   List<GeneralFireBaseList> countryList = [] ;
   GeneralFireBaseList? selectedCountry ;
-  bool isHidden = false ;
+  bool isHidden = true ;
 
 
   String? country;
@@ -285,10 +286,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             await Provider.of<UserProvider>(context , listen: false).registerUser(emailController.text , passwordController.text , userData ).then((value) {
                               if(value != null){
                                 if(value == true){
-                                  EasyLoading.showSuccess("Thanks for register in our app, You can login now");
-                                  // RegisteredSuccessfullyPage
-                                  // Navigator.push(context, MyCustomRoute(builder: (BuildContext context) => RegisteredSuccessfullyPage()));
-                                  Navigator.of(context).pop();
+                                  // EasyLoading.showSuccess("Thanks for register in our app, You can login now");
+                                  // Navigator.of(context).pop();
+                                  UserProfile userProfile = UserProfile.fromJson(userData);
+                                  Navigator.pushReplacementNamed(
+                                      context,
+                                      '/RegisteredSuccessfully',
+                                     arguments: userProfile
+                                  );
+
+
                                   return;
                                 } else{
 

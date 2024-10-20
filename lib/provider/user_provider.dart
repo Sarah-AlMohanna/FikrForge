@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 // import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -17,6 +18,41 @@ class UserProvider with ChangeNotifier{
     notifyListeners();
   }
 
+
+  Future<void> loginUserBase(BuildContext context, String email, String password) async {
+    EasyLoading.show();
+
+    try {
+      UserCredential userCredential = await loginUser(email, password);
+
+      if (userCredential.user != null) {
+        print("Login successful! User ID: ${userCredential.user!.uid}");
+        Map<String, dynamic>? userData = await getUserData(userCredential.user!.uid);
+
+        if (userData != null) {
+          EasyLoading.dismiss();
+
+          if (userData["account_type"] == "entrepreneur") {
+            // Navigator.pushReplacementNamed(context, '/homePageEntrepreneur');
+            if(kDebugMode){
+              Navigator.pushNamed(context, '/homePageEntrepreneur');
+            } else {
+              Navigator.pushReplacementNamed(context, '/homePageEntrepreneur');
+            }
+
+          } else {
+            Navigator.pushReplacementNamed(context, '/homePage');
+          }
+        } else {
+          EasyLoading.dismiss();
+          EasyLoading.showError("Login failed");
+        }
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      EasyLoading.showError("An error occurred: $e");
+    }
+  }
 
   Future<UserCredential> loginUser(String email, String password) async {
     try {

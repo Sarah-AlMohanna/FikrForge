@@ -126,10 +126,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: T9ButtonReverce(
                     onPressed: () async {
 
-                      // if(kDebugMode){
-                      //   userOrEmailController.text = "user@user.com";
-                      //   password.text = "User#1234";
-                      // }
+                      if(kDebugMode){
+                        userOrEmailController.text = "user@user.com";
+                        password.text = "User#1234";
+                      }
 
                       try {
                         if(userOrEmailController.text.isEmpty){
@@ -139,44 +139,37 @@ class _LoginScreenState extends State<LoginScreen> {
                           EasyLoading.showError("Enter password");
                           return ;
                         }
-          
-                        EasyLoading.show();
-                        UserCredential userCredential = await Provider.of<UserProvider>(context , listen: false).loginUser(userOrEmailController.text, password.text);
-                        // Login successful, you can navigate to the next screen or retrieve user data here
-                        if(userCredential.user != null){
-                          print("Login successful! User ID: ${userCredential.user!.uid}");
-                          // Map<String, dynamic>? userData = await getUserData(userCredential.user!.uid);
-                          Map<String, dynamic>? userData = await Provider.of<UserProvider>(context , listen: false).getUserData(userCredential.user!.uid);
-                          if(userData != null){
-                            // log("User Data: $userData");
-                            // String jsonString = jsonEncode(userData);
-                            // UserProfile userProfile = userProfileFromJson(jsonString);
-                            // await  Provider.of<UserProvider>(context , listen: false).setUserProfile(userProfile);
-                            EasyLoading.dismiss();
+                        ///
+                        // EasyLoading.show();
+                        // UserCredential userCredential = await Provider.of<UserProvider>(context , listen: false).loginUser(userOrEmailController.text, password.text);
+                        // if(userCredential.user != null){
+                        //   print("Login successful! User ID: ${userCredential.user!.uid}");
+                        //   // Map<String, dynamic>? userData = await getUserData(userCredential.user!.uid);
+                        //   Map<String, dynamic>? userData = await Provider.of<UserProvider>(context , listen: false).getUserData(userCredential.user!.uid);
+                        //   if(userData != null){
+                        //     EasyLoading.dismiss();
+                        //
+                        //     if(userData["account_type"] == "entrepreneur"){
+                        //       /// entrepreneur
+                        //       if(kDebugMode){
+                        //         Navigator.pushNamed(context, '/homePageEntrepreneur');
+                        //       } else {
+                        //         Navigator.pushReplacementNamed(context, '/homePageEntrepreneur');
+                        //       }
+                        //     } else {
+                        //       Navigator.pushReplacementNamed(context, '/homePage');
+                        //     }
+                        //
+                        //
+                        //   } else {
+                        //     EasyLoading.dismiss();
+                        //     EasyLoading.showError("Login failed");
+                        //   }
+                        //
+                        // }
+                        ///
+                        await Provider.of<UserProvider>(context , listen: false).loginUserBase(context, userOrEmailController.text, password.text);
 
-                            if(userData["account_type"] == "entrepreneur"){
-                              /// entrepreneur
-                              Navigator.pushReplacementNamed(context, '/homePageEntrepreneur');
-                            }else {
-                              // Navigator.pushAndRemoveUntil(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (BuildContext context) =>
-                              //             HomePage()),
-                              //         (Route<dynamic> route) => false);
-                              Navigator.pushReplacementNamed(context, '/homePage');
-
-
-                            }
-
-
-                          } else{
-                            EasyLoading.dismiss();
-                            EasyLoading.showError("Login failed");
-                          }
-          
-                        }
-          
                       } catch (e) {
                         EasyLoading.dismiss();
                         EasyLoading.showError("Login failed");

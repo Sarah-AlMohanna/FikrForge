@@ -6,12 +6,14 @@ import 'package:forgeapp/provider/dataProvider.dart';
 import 'package:forgeapp/provider/user_provider.dart';
 import 'package:forgeapp/screnns/auth/login_screen.dart';
 import 'package:forgeapp/screnns/auth/register_screen.dart';
+import 'package:forgeapp/screnns/auth/registeredSuccessfullyPage.dart';
 import 'package:forgeapp/screnns/auth/welcome_screen.dart';
 import 'package:forgeapp/screnns/home/home_page.dart';
 import 'package:forgeapp/screnns/home/home_page_entre_preneur.dart';
 import 'package:forgeapp/screnns/ideas/add_Idea.dart';
 import 'package:forgeapp/screnns/ideas/idea_details.dart';
 import 'package:forgeapp/screnns/profile/update_entrepreneur_profile.dart';
+import 'package:forgeapp/screnns/profile/userDetails.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'configuration/size_config.dart';
@@ -83,6 +85,7 @@ class _MyAppState extends State<MyApp> {
               debugShowCheckedModeBanner: false,
               title: '',
               // home: WelcomeScreen(),
+              // initialRoute: '/RegisteredSuccessfully',
               initialRoute: '/welcome',
               routes: {
                 '/welcome': (context) => WelcomeScreen(),
@@ -90,7 +93,7 @@ class _MyAppState extends State<MyApp> {
                 '/registration': (context) => RegistrationScreen(), // Add your new page here
                 '/homePage': (context) => HomePage(), // Add your new page here
                 '/homePageEntrepreneur': (context) => HomePageEntrepreneur(), // Add your new page here
-                '/addIdea': (context) => AddIdeaPage(), // Add your new page here
+                // '/addIdea': (context) => AddIdeaPage(), // Add your new page here
                 '/ideaDetails': (context) {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
                   return IdeaDetailsPage(item: item);
@@ -98,6 +101,14 @@ class _MyAppState extends State<MyApp> {
                 '/UpdateEntrepreneurProfile': (context) {
                   final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
                   return UpdateEntrepreneurProfile(userProfile: userProfile);
+                },
+                '/UserDetailsPage': (context) {
+                  final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
+                  return UserDetailsPage(userProfile: userProfile);
+                },
+                '/RegisteredSuccessfully': (context) {
+                  final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
+                  return RegisteredSuccessfullyPage(userProfile: userProfile,);
                 },
               },
 

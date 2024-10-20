@@ -15,9 +15,9 @@ class DataProvider with ChangeNotifier{
       {required String uid,required String fullName,required String bio,required String profileImage}) async {
     try {
       Map<String, dynamic> updates = {};
-        updates["fill_name"] = fullName;
-        updates["bio"] = bio;
-        updates["profile_image"] = profileImage;
+      if (fullName != "") updates["fill_name"] = fullName;
+      if (bio != "") updates["bio"] = bio;
+      if (profileImage != "") updates["profile_image"] = profileImage;
 
       // Update the user document in Firestore
       await FirebaseFirestore.instance.collection('users').doc(uid).update(updates);
@@ -29,12 +29,17 @@ class DataProvider with ChangeNotifier{
       return null;
     }
   }
-  Future getUsersData( List<UserProfile> _list) async {
+  Future getUsersData( List<UserProfile> _list , {bool isIdeaUsers = false}) async {
     // users
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
-      QuerySnapshot querySnapshot = await firestore.collection("users").get();
+      QuerySnapshot querySnapshot = isIdeaUsers
+          ? await firestore
+              .collection("users")
+              .where("account_type", isEqualTo: "entrepreneur")
+              .get()
+          : await firestore.collection("users").get();
 
       if (querySnapshot.docs.isNotEmpty) {
         for (QueryDocumentSnapshot document in querySnapshot.docs) {
@@ -50,7 +55,12 @@ class DataProvider with ChangeNotifier{
   Future<bool?>? addUserIdea(Idea ideaData) async {
     try{
 
-      await FirebaseFirestore.instance.collection('user_ideas').doc().set(ideaData.toJson());
+      await FirebaseFirestore.instance.collection('user_ideas').add(ideaData.toJson()).then((value) async {
+        await FirebaseFirestore.instance
+            .collection("user_ideas")
+            .doc(value.id)
+            .update({"idea_id": value.id});
+      });
 
       return true ;
     } catch (e) {
