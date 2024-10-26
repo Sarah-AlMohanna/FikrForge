@@ -20,17 +20,17 @@ import '../../models/user_profile_model.dart';
 import '../../provider/dataProvider.dart';
 import '../../provider/user_provider.dart';
 
-class UpdateEntrepreneurProfile extends StatefulWidget {
-  const UpdateEntrepreneurProfile({super.key, required this.userProfile});
+class UpdateProfile extends StatefulWidget {
+  const UpdateProfile({super.key, required this.userProfile});
 
   final UserProfile? userProfile;
 
   @override
-  State<UpdateEntrepreneurProfile> createState() =>
-      _UpdateEntrepreneurProfileState();
+  State<UpdateProfile> createState() =>
+      _UpdateProfileState();
 }
 
-class _UpdateEntrepreneurProfileState extends State<UpdateEntrepreneurProfile> {
+class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController fullName = TextEditingController();
   TextEditingController bio = TextEditingController();
   html.File? profileImage;

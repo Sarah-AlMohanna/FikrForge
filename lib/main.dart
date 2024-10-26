@@ -10,8 +10,11 @@ import 'package:forgeapp/screnns/auth/registeredSuccessfullyPage.dart';
 import 'package:forgeapp/screnns/auth/welcome_screen.dart';
 import 'package:forgeapp/screnns/home/home_page.dart';
 import 'package:forgeapp/screnns/home/home_page_entre_preneur.dart';
+import 'package:forgeapp/screnns/home/home_page_investor.dart';
 import 'package:forgeapp/screnns/ideas/add_Idea.dart';
 import 'package:forgeapp/screnns/ideas/idea_details.dart';
+import 'package:forgeapp/screnns/ideas/idea_details_investor.dart';
+import 'package:forgeapp/screnns/ideas/idea_more_details_investor.dart';
 import 'package:forgeapp/screnns/profile/update_entrepreneur_profile.dart';
 import 'package:forgeapp/screnns/profile/userDetails.dart';
 import 'package:provider/provider.dart';
@@ -89,18 +92,26 @@ class _MyAppState extends State<MyApp> {
               initialRoute: '/welcome',
               routes: {
                 '/welcome': (context) => WelcomeScreen(),
-                '/login': (context) => LoginScreen(), // Add your new page here
-                '/registration': (context) => RegistrationScreen(), // Add your new page here
-                '/homePage': (context) => HomePage(), // Add your new page here
-                '/homePageEntrepreneur': (context) => HomePageEntrepreneur(), // Add your new page here
-                // '/addIdea': (context) => AddIdeaPage(), // Add your new page here
+                '/login': (context) => LoginScreen(),
+                '/registration': (context) => RegistrationScreen(),
+                '/homePage': (context) => HomePage(),
+                '/homePageEntrepreneur': (context) => HomePageEntrepreneur(),
+                '/homePageInvestor': (context) => HomePageInvestor(),
                 '/ideaDetails': (context) {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
                   return IdeaDetailsPage(item: item);
                 },
-                '/UpdateEntrepreneurProfile': (context) {
-                  final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
-                  return UpdateEntrepreneurProfile(userProfile: userProfile);
+                '/IdeaDetailsInvestorPage': (context) {
+                  final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
+                  return IdeaDetailsInvestorPage(item: item);
+                },
+                '/IdeaMoreDetailsPage': (context) {
+                  final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
+                  return IdeaMoreDetailsPage(item: item);
+                },
+                '/UpdateProfile': (context) {
+                    final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
+                  return UpdateProfile(userProfile: userProfile);
                 },
                 '/UserDetailsPage': (context) {
                   final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;

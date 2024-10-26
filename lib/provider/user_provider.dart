@@ -18,6 +18,14 @@ class UserProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  bool isInvestor = false ;
+
+  setIsInvestor (bool boolNew){
+    isInvestor = boolNew  ;
+    notifyListeners();
+  }
+
+
 
   Future<void> loginUserBase(BuildContext context, String email, String password) async {
     EasyLoading.show();
@@ -41,7 +49,15 @@ class UserProvider with ChangeNotifier{
             }
 
           } else {
-            Navigator.pushReplacementNamed(context, '/homePage');
+            setIsInvestor(true);
+            /// investor
+            if(kDebugMode){
+              Navigator.pushNamed(context, '/homePageInvestor');
+            } else {
+              Navigator.pushReplacementNamed(context, '/homePageInvestor');
+            }
+
+
           }
         } else {
           EasyLoading.dismiss();
@@ -70,12 +86,20 @@ class UserProvider with ChangeNotifier{
     }
   }
 
-  Future<Map<String, dynamic>?> getUserData(String uid) async {
+  Future<Map<String, dynamic>?> getUserData(String uid , {bool justData = false}) async {
     try {
       var userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if(userDoc.data() == null){
+
+        return null;
+      }
+
       String jsonString = jsonEncode(userDoc.data());
+
       UserProfile userProfile = userProfileFromJson(jsonString);
-      await  setUserProfile(userProfile);
+      if(!justData){
+        await  setUserProfile(userProfile);
+      }
       return userDoc.data();
     } catch (e) {
       print("Error retrieving user data: $e");

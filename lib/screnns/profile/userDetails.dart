@@ -5,6 +5,7 @@ import '../../configuration/theme.dart';
 import '../../models/IdeaModel.dart';
 import '../../models/user_profile_model.dart';
 import '../../provider/dataProvider.dart';
+import '../../provider/user_provider.dart';
 
 class UserDetailsPage extends StatefulWidget {
   const UserDetailsPage({super.key, required this.userProfile});
@@ -85,15 +86,21 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                       return Card(
                           child: ListTile(
                             onTap: (){
-                              // Navigator.pushNamed(
-                              //   context,
-                              //   '/ideaDetails',
-                              //   arguments: item,
-                              // );
+                              if(Provider.of<UserProvider>(context , listen: false).isInvestor){
+                                Navigator.pushNamed(
+                                  context,
+                                  '/IdeaDetailsInvestorPage',
+                                  arguments: item,
+                                );
+                              }
                             },
-                            leading: Image.network("${item.image}"),
+                            leading: Image.network("${item.image}" , width: size_W(25)
+                              , height: size_W(25), errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
+                                return Image.asset("assets/images/logo.png" ,width: size_W(25)
+                                    , height: size_W(25));
+                              } ,),
                             title: Text("${item.title}" , style: ourTextStyle(fontSize: 15 , fontWeight: FontWeight.w600),),
-                            subtitle: Text("${item.description}" , style: ourTextStyle(),maxLines: 5,overflow: TextOverflow.ellipsis,),
+                            subtitle: Text("${item.description}" , style: ourTextStyle(), maxLines: Provider.of<UserProvider>(context , listen: false).isInvestor ? 2: 5,overflow: TextOverflow.ellipsis,),
                             trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
                           ));
 

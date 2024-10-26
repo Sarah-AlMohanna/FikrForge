@@ -16,17 +16,17 @@ import '../../provider/user_provider.dart';
 import 'notificationsPage.dart';
 import 'searchPage.dart';
 
-class HomePageEntrepreneur extends StatefulWidget {
-  const HomePageEntrepreneur({super.key});
+class HomePageInvestor extends StatefulWidget {
+  const HomePageInvestor({super.key});
 
   @override
-  State<HomePageEntrepreneur> createState() => _HomePageEntrepreneurState();
+  State<HomePageInvestor> createState() => _HomePageInvestorState();
 }
 
-class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
+class _HomePageInvestorState extends State<HomePageInvestor> {
   int pageSelected = 0 ;
   UserProfile? userProfile ;
-  List<Idea>? myIdeas  ;
+  List<Idea>? myInvestmentIdeas  ;
   @override
   void initState() {
     // TODO: implement initState
@@ -36,9 +36,9 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
 
       userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
       if(userProfile!.userId != null) {
-        print("myIdeas_ ${myIdeas?.length}");
-        myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
-        print("myIdeas_ ${myIdeas?.length}");
+        print("myInvestmentIdeas_ ${myInvestmentIdeas?.length}");
+        myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"") ;
+        print("myIdeas_ ${myInvestmentIdeas?.length}");
       }
       setState(() {});
     });
@@ -56,23 +56,6 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
         actions: [ Image.asset("assets/images/logo.png" , width:size_W(30),color: Theme_Information.Color_1,),],
 
       ),
-      ///
-      // floatingActionButton: FloatingActionButton.extended(
-      //   backgroundColor: Theme_Information.Primary_Color,
-      //   onPressed: (){
-      //     Navigator.pushNamed(context, '/addIdea').then((value) async {
-      //     if(value != null){
-      //       EasyLoading.show();
-      //       myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
-      //       setState(() {});
-      //       EasyLoading.dismiss();
-      //     }
-      //     });
-      //   },
-      //   label: Text("Add Idea" , style: ourTextStyle(color: Theme_Information.Color_1 , fontSize: 16),),
-      //   icon: Icon(Icons.add , color: Theme_Information.Color_1,),
-      // ),
-      ///
         body: Container(
                 height: MediaQuery.of(context).size.height,
                 child: Row(
@@ -92,15 +75,9 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                               pageSelected = 1 ;
                             });
                           }),
-
                           buildContainerIcon(IconData: Icons.search ,isSelected: pageSelected == 2 , onTap: (){
                             setState(() {
                               pageSelected = 2 ;
-                            });
-                          }),
-                          buildContainerIcon(IconData: Icons.add ,isSelected: pageSelected == 3 , onTap: (){
-                            setState(() {
-                              pageSelected = 3 ;
                             });
                           }),
                           buildContainerIcon(IconData: Icons.logout ,isSelected: pageSelected == 4 , onTap: (){
@@ -132,6 +109,7 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                             );
 
                           }),
+
                         ],
                       ),
                     ),
@@ -143,13 +121,11 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
 
   String titleAppbar() {
     if(pageSelected == 0){
-      return "Entrepreneur Account" ;
+      return "Home page" ;
     } else if(pageSelected == 1){
-      return "Notification Page" ;
+      return "Notifications Page" ;
     } else if(pageSelected == 2){
       return "Search User" ;
-    } else if(pageSelected == 3){
-      return "Add your Idea" ;
     } else {
       return "";
     }
@@ -164,20 +140,11 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
     }
     else if(pageSelected == 1){
       return NotificationsPage();
-    }
-    else if(pageSelected == 2){
+    }else if(pageSelected == 2){
       return userProfile == null
           ? SizedBox()
           : SearchPage();
-    } else if(pageSelected == 3){
-      return AddIdeaPage(backToHome: (){
-       setState(() {
-         pageSelected == 0 ;
-       });
-      });
-    }
-
-    else {
+    }     else {
       return SizedBox();
     }
 
@@ -248,7 +215,7 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                           EasyLoading.show();
                           await Provider.of<UserProvider>(context , listen: false).getUserData(userProfile?.userId??"");
                           userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
-                          myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
+                          myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"") ;
                           setState(() {});
                           EasyLoading.dismiss();
                         }
@@ -267,11 +234,11 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("My Ideas" , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
+                    Text("My Investments" , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
                     InkWell(
                         onTap: () async {
                             EasyLoading.show();
-                            myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
+                            myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"") ;
                             setState(() {});
                             EasyLoading.dismiss();
                         },
@@ -282,11 +249,11 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                   ],
                 ),
               ),
-              if(myIdeas != null)
+              if(myInvestmentIdeas != null)
                 Center(child: Align(alignment: Alignment.center, child:
                 Column(
-                  children: List.generate(myIdeas!.length, (index) {
-                    final item =  myIdeas![index];
+                  children: List.generate(myInvestmentIdeas!.length, (index) {
+                    final item =  myInvestmentIdeas![index];
                     return Card(
                         child: ListTile(
                           onTap: (){
@@ -304,14 +271,14 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                             } ,),
                             title: Text("${item.title}" , style: ourTextStyle(fontSize: 15 , fontWeight: FontWeight.w600),),
                             subtitle: Text("${item.description}" , style: ourTextStyle(),maxLines: 2,overflow: TextOverflow.ellipsis,),
-                             trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
+                             // trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
 
                         ));
 
                   }),
                 )
                 )),
-              if(myIdeas == null)
+              if(myInvestmentIdeas == null)
                 Center(child: Text("There is no Data" , style: ourTextStyle(),)),
             ],
           ))

@@ -1,8 +1,4 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,40 +7,36 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
 
-import '../../commenwidget/investorDialog.dart';
-import '../../commenwidget/requestedDialog.dart';
+import '../../commenwidget/investWidget.dart';
 import '../../configuration/theme.dart';
 import '../../models/IdeaModel.dart';
 import '../../provider/dataProvider.dart';
 
-class IdeaDetailsPage extends StatefulWidget {
-  const IdeaDetailsPage({super.key , required this.item});
+class IdeaDetailsInvestorPage extends StatefulWidget {
+  const IdeaDetailsInvestorPage({super.key , required this.item});
   final Idea item ;
   @override
-  State<IdeaDetailsPage> createState() => _IdeaDetailsPageState();
+  State<IdeaDetailsInvestorPage> createState() => _IdeaDetailsInvestorPageState();
 }
 
-class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
-
-  List<Map<String, dynamic>>? requestedList ;
-  List<Map<String, dynamic>>? investorList  ;
-
+class _IdeaDetailsInvestorPageState extends State<IdeaDetailsInvestorPage> {
+  bool _isInvest = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
     Future.delayed(const Duration(microseconds: 3), () async {
+      // _isInvest
       EasyLoading.show();
-      requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
-      investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
+      _isInvest = await Provider.of<DataProvider>(context, listen: false).getIsInvest(widget.item )??false;
       EasyLoading.dismiss();
+      print("_isInvest ${_isInvest  }");
       setState(() {});
     });
 
-  }
 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,84 +49,7 @@ class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
             fontSize: 16,
             color: Theme_Information.Color_1),),
         actions: [
-          // Image.asset("assets/images/logo.png", width: size_W(30), color: Theme_Information.Color_1,),
-          if(requestedList != null && requestedList!.isNotEmpty &&
-              widget.item.userId == FirebaseAuth.instance.currentUser!.uid
-          )
-          InkWell(
-            onTap: (){
-              List<Map<String, dynamic>> requestedListTemp =  List.from(requestedList!) ;
-
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return RequestedDialog(requested: requestedListTemp!);
-                },
-              ).then((value) async {
-                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
-                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
-                setState(() {});
-              });
-
-            },
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("See Requested" , style: ourTextStyle(),),
-              ),
-            ),
-          ),
-          if(investorList != null && investorList!.isNotEmpty&&
-              widget.item.userId == FirebaseAuth.instance.currentUser!.uid
-          )
-          InkWell(
-            onTap: (){
-
-              List<Map<String, dynamic>> investorListTemp =  List.from(investorList!) ;
-
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return InvestorDialog(investors: investorListTemp!);
-                },
-              ).then((value) async {
-                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
-                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
-                setState(() {});
-              });
-
-
-            },
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("See Investor" , style: ourTextStyle(),),
-              ),
-            ),
-          ),
-
-          if(requestedList != null && requestedList!.isEmpty && investorList != null && investorList!.isEmpty &&
-          widget.item.userId == FirebaseAuth.instance.currentUser!.uid
-          )
-          InkWell(
-            onTap: (){
-              _showDeleteDialog(context);
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(Icons.delete),
-            ),
-          ) ,
-          ///
-          // InkWell(
-          //   onTap: (){
-          //
-          //   },
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: Icon(Icons.edit),
-          //   ),
-          // )
+          Image.asset("assets/images/logo.png", width: size_W(30), color: Theme_Information.Color_1,),
         ],
       ),
       body: SingleChildScrollView(
@@ -173,22 +88,25 @@ class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
                       ),
                     ),
                   ),
-                  buildCardData(data: widget.item.additionalInfo,
-                      title: "AdditionalInfo"),
 
-                  buildCardData(
-                      data: widget.item.typeInvestor, title: "Type Investor"),
+                  Center(child: InkWell(
+                    onTap: (){
+                      //
+                      Navigator.pushNamed(
+                        context,
+                        '/IdeaMoreDetailsPage',
+                        arguments: widget.item,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text("More Details" , style: ourTextStyle(fontSize: 16,
+                          fontWeight: FontWeight.bold),),
+                    ),
+                  )) ,
 
-                  buildCardData(data: widget.item.ideaCategory, title: "Category"),
-                  buildCardData(data: widget.item.businessModel, title: "Business Model"),
-                  buildCardData(data: widget.item.targetAudience, title: "Target Audience"),
-                  buildCardData(data: widget.item.intellectualPropertyStatus, title: "Intellectual Property Status"),
-
-                  buildCardDataBudget(min: widget.item.budgetMinimum ?? "",
-                      max: widget.item.budgetMaximum ?? "",
-                      title: "Budget Estimate"),
-
-                  buildCardDataSupporting(data: widget.item.supportingDocuments, title: "Supporting Documents"),
+                  if(!_isInvest)
+                  PaymentSelector(item: widget.item,),
 
 
                 ],

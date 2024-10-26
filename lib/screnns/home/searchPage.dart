@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../commenwidget/textInput.dart';
-import '../configuration/theme.dart';
-import '../models/user_profile_model.dart';
-import '../provider/dataProvider.dart';
+import '../../commenwidget/textInput.dart';
+import '../../configuration/theme.dart';
+import '../../models/user_profile_model.dart';
+import '../../provider/dataProvider.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  const SearchPage({super.key });
 
   @override
   State<SearchPage> createState() => _SearchPageState();

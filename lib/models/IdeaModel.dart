@@ -84,7 +84,7 @@ class Idea {
     budgetMaximum: json["budget maximum"],
     supportingDocuments: json["supporting_documents"] == null ? [] : List<String>.from(json["supporting_documents"]!.map((x) => x)),
     intellectualPropertyStatus: json["intellectualPropertyStatus"],
-    userId: json["userId"],
+    userId: json["user_id"],
     uploadedAt: json["uploadedAt"],
   );
 
@@ -105,8 +105,7 @@ class Idea {
     "budget maximum": budgetMaximum,
     "supporting_documents": supportingDocuments == null ? [] : List<dynamic>.from(supportingDocuments!.map((x) => x)),
     "intellectualPropertyStatus": intellectualPropertyStatus,
-    "userId": userId,
-
+    "user_id": userId,
 
   };
 }
