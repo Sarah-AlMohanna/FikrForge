@@ -14,6 +14,32 @@ class DataProvider with ChangeNotifier{
   // notifyListeners();
 
 
+  Future<bool?>? updateIdea(
+      {required String uid,required String image,required String description,
+        required String budgetMinimum,
+        required String budgetMaximum,
+        required String file,
+
+      }) async {
+    try {
+      Map<String, dynamic> updates = {};
+      if (image != "") updates["image"] = image;
+      if (description != "") updates["description"] = description;
+      if (budgetMinimum != "") updates["budget_minimum"] = budgetMinimum;
+      if (budgetMaximum != "") updates["budget_maximum"] = budgetMaximum;
+      if (file != "") updates["file"] = file;
+
+      // Update the user document in Firestore
+      await FirebaseFirestore.instance.collection('user_ideas').doc(uid).update(updates);
+
+      return true;
+    } catch (e) {
+      // Handle errors here
+      print('Error updating data: $e');
+      return null;
+    }
+  }
+
   Future<bool?>? updateUserProfile(
       {required String uid,required String fullName,required String bio,required String profileImage}) async {
     try {
@@ -32,6 +58,7 @@ class DataProvider with ChangeNotifier{
       return null;
     }
   }
+
   Future getUsersData( List<UserProfile> _list , {bool isIdeaUsers = false}) async {
     // users
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -85,6 +112,9 @@ class DataProvider with ChangeNotifier{
 
 
       await sendNotificationToUser("${investData["invest_id"]??""}" , "You request to '${IdeaData.title}' has been accepted"  , context, extraData:extraData);
+
+      updateAmount(IdeaData.idea_id ??"" , double.tryParse("${investData["invest_budget"]}")??0);
+
 
       return true ;
     } catch (e) {
@@ -151,6 +181,30 @@ class DataProvider with ChangeNotifier{
     }
   }
 
+
+  Future<void> updateAmount(String ideaId, double additionalAmount) async {
+    // Reference to the Firestore collection
+    CollectionReference ideasCollection = FirebaseFirestore.instance.collection('user_ideas');
+
+    // Fetch the document
+    DocumentSnapshot snapshot = await ideasCollection.doc(ideaId).get();
+
+    if (snapshot.exists) {
+      // Get the current amount
+      double currentAmount = double.tryParse(snapshot['amount'])??0;
+
+      // Calculate the new amount
+      double newAmount = currentAmount + additionalAmount;
+
+      // Update the document with the new amount
+      await ideasCollection.doc(ideaId).update({'amount': "${newAmount}"});
+
+      print('Amount updated successfully to $newAmount');
+    } else {
+      print('Document does not exist');
+    }
+  }
+
   Future<bool?>? getIsInvest(Idea ideaData) async {
     try{
 
@@ -208,6 +262,76 @@ class DataProvider with ChangeNotifier{
   }
 
 
+  Future<bool?>? changeIdeaStatus(Idea ideaData ) async {
+    // List<Map<String, dynamic>> _listRequested = [] ;
+    // List<Map<String, dynamic>> _listInvested = [] ;
+    double currentAmount = 0 ;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      /// Invested
+      QuerySnapshot querySnapshotInvested =
+      await firestore
+          .collection("invest_ideas")
+          .where("idea_id", isEqualTo: ideaData.idea_id)
+          .get();
+
+      if (querySnapshotInvested.docs.isNotEmpty) {
+        for (QueryDocumentSnapshot document in querySnapshotInvested.docs) {
+          // _listInvested.add(document.data() as Map<String, dynamic>);
+          try{
+            currentAmount = currentAmount + num.parse("${(document.data() as Map<String, dynamic>)["invest_budget"]}") ;
+          } catch (e){
+            print("Error: querySnapshotInvested ${e}");
+          }
+        }
+      }
+      /// Requested
+      // QuerySnapshot querySnapshotRequested =
+      // await firestore
+      //     .collection("user_ideas_invest_request")
+      //     .where("request_status", isEqualTo: "requested")
+      //     .where("idea_id", isEqualTo: ideaData.idea_id)
+      //     .get();
+      //
+      // if (querySnapshotRequested.docs.isNotEmpty) {
+      //   for (QueryDocumentSnapshot document in querySnapshotRequested.docs) {
+      //     // return data.docs.first.data() as Map<String, dynamic>;
+      //     // _listRequested.add(document.data() as Map<String, dynamic>);
+      //     try{
+      //       currentAmount = currentAmount + num.parse("${(document.data() as Map<String, dynamic>)["invest_budget"]}") ;
+      //     } catch (e){
+      //       print("Error: querySnapshotRequested ${e}");
+      //     }
+      //   }
+      // }
+      // print("currentAmount :  ${currentAmount}");
+      try{
+        num max = num.parse("${ideaData.budgetMaximum}") ;
+        print("budgetMaximum :  ${currentAmount >= max}");
+        if(currentAmount >= max){
+          await FirebaseFirestore.instance
+              .collection("user_ideas")
+              .doc(ideaData.idea_id)
+              .update({"status": "Completed"});
+        } else {
+          await FirebaseFirestore.instance
+              .collection("user_ideas")
+              .doc(ideaData.idea_id)
+              .update({"status": "In progress"});
+        }
+      } catch (e){
+        print("Error: budgetMaximum ${e}");
+      }
+
+
+
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
+
+
   Future<bool?>? sendNotificationToUser(String userId, String notification , context , {Map<String, dynamic>? extraData}) async {
     try{
       Map<String, dynamic> data = {
@@ -260,7 +384,7 @@ class DataProvider with ChangeNotifier{
 
 
 
-  Future<List<Map<String, dynamic>>?> getRequestedData() async {
+  Future<List<Map<String, dynamic>>?> getRequestedData(String ideaID) async {
     List<Map<String, dynamic>> _list = [] ;
     // users
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -270,6 +394,7 @@ class DataProvider with ChangeNotifier{
       await firestore
           .collection("user_ideas_invest_request")
           .where("request_status", isEqualTo: "requested")
+          .where("idea_id", isEqualTo: ideaID)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -284,7 +409,7 @@ class DataProvider with ChangeNotifier{
     }
   }
 
-  Future<List<Map<String, dynamic>>?> getInvestorData() async {
+  Future<List<Map<String, dynamic>>?> getInvestorData(String ideaID) async {
     List<Map<String, dynamic>> _list = [] ;
     // users
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -293,6 +418,7 @@ class DataProvider with ChangeNotifier{
       QuerySnapshot querySnapshot =
       await firestore
           .collection("invest_ideas")
+          .where("idea_id", isEqualTo: ideaID)
           .where("user_id", isEqualTo: FirebaseAuth.instance.currentUser?.uid??"")
           .get();
 
@@ -307,7 +433,6 @@ class DataProvider with ChangeNotifier{
       print('Error fetching data: $e');
     }
   }
-
 
 
   Future<bool?>? addUserIdea(Idea ideaData) async {
@@ -329,7 +454,6 @@ class DataProvider with ChangeNotifier{
   }
 
 
-
   Future<List<Idea>?> getUsersIdeas(String userID) async {
     List<Idea> _list = [] ;
     // users
@@ -341,6 +465,31 @@ class DataProvider with ChangeNotifier{
       QuerySnapshot querySnapshot = await firestore
           .collection("user_ideas")
           .where("user_id", isEqualTo: userID)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (QueryDocumentSnapshot document in querySnapshot.docs) {
+          Idea data = Idea.fromJson(document.data() as Map<String, dynamic>);
+          _list.add(data);
+        }
+        return _list ;
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
+
+
+  Future<List<Idea>?> getAllIdeasToInvest(String userID) async {
+    List<Idea> _list = [] ;
+    // users
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      // QuerySnapshot querySnapshot = await firestore.collection("user_ideas").get();
+
+      QuerySnapshot querySnapshot = await firestore
+          .collection("user_ideas")
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {

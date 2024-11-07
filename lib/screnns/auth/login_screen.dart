@@ -128,12 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       if(kDebugMode){
                         /// entrepreneur
-                        userOrEmailController.text = "user@user.com";
-                        password.text = "User#1234";
+                        // userOrEmailController.text = "user@user.com";
+                        // password.text = "User#1234";
 
                         /// Investor
-                        // userOrEmailController.text = "investhanoof@gmail.com";
-                        // password.text = "HanoofInvest11\$";
+                        userOrEmailController.text = "investhanoof@gmail.com";
+                        password.text = "HanoofInvest11\$";
                         // userOrEmailController.text = "Abdulaziz@gmail.com";
                         // password.text = "Abdulaziz102@";
 

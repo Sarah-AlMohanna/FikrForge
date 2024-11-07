@@ -15,6 +15,7 @@ import 'package:forgeapp/screnns/ideas/add_Idea.dart';
 import 'package:forgeapp/screnns/ideas/idea_details.dart';
 import 'package:forgeapp/screnns/ideas/idea_details_investor.dart';
 import 'package:forgeapp/screnns/ideas/idea_more_details_investor.dart';
+import 'package:forgeapp/screnns/ideas/update_idea.dart';
 import 'package:forgeapp/screnns/profile/update_entrepreneur_profile.dart';
 import 'package:forgeapp/screnns/profile/userDetails.dart';
 import 'package:provider/provider.dart';
@@ -100,6 +101,10 @@ class _MyAppState extends State<MyApp> {
                 '/ideaDetails': (context) {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
                   return IdeaDetailsPage(item: item);
+                },
+                '/UpdateIdea': (context) {
+                  final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
+                  return UpdateIdea(item: item);
                 },
                 '/IdeaDetailsInvestorPage': (context) {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;

@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:forgeapp/configuration/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../models/IdeaModel.dart';
 import '../provider/dataProvider.dart';
 import '../provider/user_provider.dart';
 
@@ -85,6 +86,11 @@ class RequestedDialog extends StatelessWidget {
                               onTap: () async {
                                 EasyLoading.show();
                                 await Provider.of<DataProvider>(context, listen: false).acceptInvestRequest(request , context );
+                                Idea IdeaData = Idea.fromJson(request);
+
+                                await Provider.of<DataProvider>(context, listen: false).changeIdeaStatus(IdeaData );
+
+
                                 EasyLoading.dismiss();
                                 setState(() {
                                   requested.remove(request);

@@ -8,8 +8,10 @@ import '../models/IdeaModel.dart';
 import '../provider/dataProvider.dart';
 
 class PaymentSelector extends StatefulWidget {
-  const PaymentSelector({super.key , required this.item});
+  const PaymentSelector({super.key , required this.item, this.isThereOther = true , this.callBack });
   final Idea item ;
+  final bool isThereOther ;
+  final Function()? callBack ;
   @override
   _PaymentSelectorState createState() => _PaymentSelectorState();
 }
@@ -21,6 +23,12 @@ class _PaymentSelectorState extends State<PaymentSelector> {
   void _selectAmount(int amount) {
     setState(() {
       selectedAmount = amount;
+      if (amount != 0) _otherAmountController.clear(); // Clear text field if not "Other"
+    });
+  }
+  void _unselectAmount(int amount) {
+    setState(() {
+      selectedAmount = null;
       if (amount != 0) _otherAmountController.clear(); // Clear text field if not "Other"
     });
   }
@@ -37,7 +45,9 @@ class _PaymentSelectorState extends State<PaymentSelector> {
             Expanded(child: _amountBox(2500)),
             SizedBox(width: size_W(2),),
             Expanded(child: _amountBox(5000)),
+            if(widget.isThereOther)
             SizedBox(width: size_W(2),),
+            if(widget.isThereOther)
             Expanded(child: _amountBox(0)),
           ],
         ),
@@ -54,14 +64,28 @@ class _PaymentSelectorState extends State<PaymentSelector> {
           padding: const EdgeInsets.all(20.0),
           child: ElevatedButton(
             onPressed: () async {
+
               final amountToPay = selectedAmount == 0
                   ? int.tryParse(_otherAmountController.text)
                   : selectedAmount;
               EasyLoading.show();
               print("dddd_data ${widget.item.userId}");
               await Provider.of<DataProvider>(context, listen: false).sendRequestToInvestIdea(widget.item , context , amountToPay??0);
+
+              await Provider.of<DataProvider>(context, listen: false).changeIdeaStatus(widget.item );
+
+
+
               EasyLoading.showSuccess("Thanks for send request ,idea owner will replay to you soon") ;
-              Navigator.pushNamed(context, '/homePageInvestor');
+              if(widget.isThereOther){
+                Navigator.pushNamed(context, '/homePageInvestor');
+              } else {
+                if(widget.callBack != null){
+                  widget.callBack!();
+                  selectedAmount = null ;
+                }
+              }
+
             },
             child: Text('Send request to invest' , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.bold),),
           ),
@@ -74,7 +98,7 @@ class _PaymentSelectorState extends State<PaymentSelector> {
     bool isSelected = selectedAmount == amount;
 
     return GestureDetector(
-      onTap: () => _selectAmount(amount),
+      onTap: () => isSelected ? _unselectAmount(amount) : _selectAmount(amount),
       child: Container(
         // width: size_W(150),
         height:  size_W(25),
@@ -85,7 +109,7 @@ class _PaymentSelectorState extends State<PaymentSelector> {
         ),
         child: Center(
           child: Text(
-            amount == 0 ? 'Other' : '${amount}SAR',
+            amount == 0 ? 'Other' : '${amount} SAR',
             style: ourTextStyle(
               color: isSelected ? Colors.white : Colors.black,
               fontSize: 16,

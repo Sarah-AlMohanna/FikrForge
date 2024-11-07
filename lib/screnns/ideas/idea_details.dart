@@ -37,8 +37,8 @@ class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
 
     Future.delayed(const Duration(microseconds: 3), () async {
       EasyLoading.show();
-      requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
-      investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
+      requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData(widget.item.idea_id??"")??[];
+      investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData(widget.item.idea_id??"")??[];
       EasyLoading.dismiss();
       setState(() {});
     });
@@ -71,8 +71,8 @@ class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
                   return RequestedDialog(requested: requestedListTemp!);
                 },
               ).then((value) async {
-                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
-                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
+                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData(widget.item.idea_id??"")??[];
+                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData(widget.item.idea_id??"")??[];
                 setState(() {});
               });
 
@@ -91,15 +91,14 @@ class _IdeaDetailsPageState extends State<IdeaDetailsPage> {
             onTap: (){
 
               List<Map<String, dynamic>> investorListTemp =  List.from(investorList!) ;
-
               showDialog(
                 context: context,
                 builder: (context) {
                   return InvestorDialog(investors: investorListTemp!);
                 },
               ).then((value) async {
-                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData()??[];
-                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData()??[];
+                investorList = await Provider.of<DataProvider>(context, listen: false).getInvestorData(widget.item.idea_id??"")??[];
+                requestedList = await Provider.of<DataProvider>(context, listen: false).getRequestedData(widget.item.idea_id??"")??[];
                 setState(() {});
               });
 

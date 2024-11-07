@@ -117,7 +117,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 const SizedBox(height: 16),
 
 
-                // Password
+                // Country/region
                 Container(
                     padding:  EdgeInsets.only(right: size_W(15), left: size_W(15)), margin: const EdgeInsets.only(
                     left: 20, right: 20, top: 0, bottom: 0),child: Text("Country/region", style: ourTextStyle(fontSize: 15))),
@@ -250,6 +250,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         } else  if(emailController.text.isEmpty){
                           EasyLoading.showError("Please add the email address");
                           return ;
+
                         } else   if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(emailController.text)) {
                           EasyLoading.showError('Please enter a valid email address');
                         }
@@ -271,7 +272,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             fillName: fullNameController.text,
                             email: emailController.text,
                             phoneNumber: phoneController.text.isNotEmpty? phoneController.text : "",
-                            birthDate: emailController.text,
+                            birthDate: birthDateController.text,
                             countryId: '${selectedCountry!.id}',
                             password:  passwordController.text,
                             accountType: "$_accountType",

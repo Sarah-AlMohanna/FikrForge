@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:forgeapp/configuration/theme.dart';
+import 'package:forgeapp/screnns/home/profile_entre_preneur.dart';
+import 'package:forgeapp/screnns/home/projects_entre_preneur_page.dart';
 import 'package:forgeapp/screnns/ideas/add_Idea.dart';
 import 'package:provider/provider.dart';
 
@@ -25,25 +27,8 @@ class HomePageEntrepreneur extends StatefulWidget {
 
 class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
   int pageSelected = 0 ;
-  UserProfile? userProfile ;
-  List<Idea>? myIdeas  ;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    Future.delayed(const Duration(microseconds: 3), () async {
+  bool menuShown = false ;
 
-
-      userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
-      if(userProfile!.userId != null) {
-        print("myIdeas_ ${myIdeas?.length}");
-        myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
-        print("myIdeas_ ${myIdeas?.length}");
-      }
-      setState(() {});
-    });
-
-  }
 
 
   @override
@@ -51,9 +36,40 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData( color: Theme_Information.Color_1),
+        leading: InkWell(
+          onTap: (){
+            setState(() {
+              menuShown = !menuShown ;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.menu),
+          ),
+        ),
         backgroundColor: Theme_Information.Primary_Color.withOpacity(0.8),
         title: Text(titleAppbar() , style: ourTextStyle(fontWeight: FontWeight.w600 , fontSize: 16 , color: Theme_Information.Color_1),),
-        actions: [ Image.asset("assets/images/logo.png" , width:size_W(30),color: Theme_Information.Color_1,),],
+        actions: [
+          // Image.asset("assets/images/logo.png" , width:size_W(30),color: Theme_Information.Color_1,),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildContainerIcon(IconData: Icons.notifications ,isSelected: true  ,size: 30, onTap: (){
+              setState(() {
+                pageSelected = 1 ;
+              });
+            }),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildContainerIcon(IconData: Icons.account_circle ,isSelected: true ,size: 30, onTap: (){
+              setState(() {
+                pageSelected = 4 ;
+              });
+            }),
+          ),
+        ],
 
       ),
       ///
@@ -77,6 +93,7 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                 height: MediaQuery.of(context).size.height,
                 child: Row(
                   children: [
+                    if(menuShown)
                     Container(
                       width: 56,
                       color: Theme_Information.Primary_Color.withOpacity(0.8),
@@ -103,7 +120,12 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                               pageSelected = 3 ;
                             });
                           }),
-                          buildContainerIcon(IconData: Icons.logout ,isSelected: pageSelected == 4 , onTap: (){
+                          buildContainerIcon(IconData: Icons.account_circle ,isSelected: pageSelected == 4 , onTap: (){
+                            setState(() {
+                              pageSelected = 4 ;
+                            });
+                          }),
+                          buildContainerIcon(IconData: Icons.logout ,isSelected: pageSelected == 5 , onTap: (){
                             // setState(() {
                             //   pageSelected = 4 ;
                             // });
@@ -135,6 +157,8 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
                         ],
                       ),
                     ),
+                    if(!menuShown)
+                      SizedBox(width: 1,),
                     Expanded(flex: 10, child: buildProfilePage(context))
                   ],
                 ),
@@ -143,13 +167,15 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
 
   String titleAppbar() {
     if(pageSelected == 0){
-      return "Entrepreneur Account" ;
+      return "My Projects" ;
     } else if(pageSelected == 1){
       return "Notification Page" ;
     } else if(pageSelected == 2){
       return "Search User" ;
     } else if(pageSelected == 3){
       return "Add your Idea" ;
+    } else if(pageSelected == 4){
+      return "Profile Page" ;
     } else {
       return "";
     }
@@ -158,23 +184,21 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
 
   Widget buildProfilePage(BuildContext context){
     if(pageSelected == 0){
-      return userProfile == null
-          ? SizedBox()
-          : ProfilePage(context);
+      return EntrepreneurProjectsPage();
     }
     else if(pageSelected == 1){
       return NotificationsPage();
     }
     else if(pageSelected == 2){
-      return userProfile == null
-          ? SizedBox()
-          : SearchPage();
+      return SearchPage();
     } else if(pageSelected == 3){
       return AddIdeaPage(backToHome: (){
        setState(() {
          pageSelected == 0 ;
        });
       });
+    } else if(pageSelected == 4){
+      return  EntrepreneurProfilePage();
     }
 
     else {
@@ -186,7 +210,8 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
   Widget buildContainerIcon({
     required IconData,
     required Function() onTap,
-    required bool isSelected
+    required bool isSelected,
+    double? size
   }) {
     return InkWell(
       onTap: () {
@@ -198,125 +223,78 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
             height: size_H(60),
             child: Icon(
               IconData,
-              size: isSelected ? 25 : 20,
+              size: size ?? (isSelected ? 25 : 20),
               color: isSelected ? Theme_Information.Color_1 : Theme_Information.Color_5,
             )),
       ),
     );
   }
 
-  Widget ProfilePage(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // ClipRRect(
-              ClipOval(
-
-                // borderRadius: BorderRadius.circular(75.0),
-                child: Image.network(userProfile!.profileImage ??"" ,width: size_W(40)  , height: size_W(40) , fit: BoxFit.fill  ,  errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
-                  return Image.network("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" ,width: size_W(40)
-                      , height: size_W(40));
-                },),
-              ),
-              SizedBox(width: size_W(5),),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome ${userProfile!.fillName}", style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
-
-                    Text(userProfile!.bio??"" , style: ourTextStyle(),),
-                  ],
-                ),
-              ),
-              SizedBox(width: size_W(5),),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: (150),
-                  child: T9ButtonReverce(
-                    onPressed: (){
-                      Navigator.pushNamed(
-                        context,
-                        '/UpdateProfile',
-                        arguments: userProfile,
-                      ).then((value) async {
-                        if(value != null){
-                          EasyLoading.show();
-                          await Provider.of<UserProvider>(context , listen: false).getUserData(userProfile?.userId??"");
-                          userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
-                          myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
-                          setState(() {});
-                          EasyLoading.dismiss();
-                        }
-                      });
-                    },
-                      textContent:"Edit Profile")),
-              )
-            ],
-          ),
-          Divider(),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0 , bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("My Ideas" , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
-                    InkWell(
-                        onTap: () async {
-                            EasyLoading.show();
-                            myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
-                            setState(() {});
-                            EasyLoading.dismiss();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(Icons.refresh),
-                        ))
-                  ],
-                ),
-              ),
-              if(myIdeas != null)
-                Center(child: Align(alignment: Alignment.center, child:
-                Column(
-                  children: List.generate(myIdeas!.length, (index) {
-                    final item =  myIdeas![index];
-                    return Card(
-                        child: ListTile(
-                          onTap: (){
-                          //   ideaDetails
-                            Navigator.pushNamed(
-                              context,
-                              '/ideaDetails',
-                              arguments: item,
-                            );
-                          },
-                            leading: Image.network("${item.image}" , width: size_W(25)
-                          , height: size_W(25), errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
-                              return Image.asset("assets/images/logo.png" ,width: size_W(25)
-                                  , height: size_W(25));
-                            } ,),
-                            title: Text("${item.title}" , style: ourTextStyle(fontSize: 15 , fontWeight: FontWeight.w600),),
-                            subtitle: Text("${item.description}" , style: ourTextStyle(),maxLines: 2,overflow: TextOverflow.ellipsis,),
-                             trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
-
-                        ));
-
-                  }),
-                )
-                )),
-              if(myIdeas == null)
-                Center(child: Text("There is no Data" , style: ourTextStyle(),)),
-            ],
-          ))
-        ],
-      ),
-    );
-  }
+  // Widget EntrepreneurProjectsPage(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(15.0),
+  //     child: Column(
+  //       children: [
+  //        SizedBox(height: 1,),
+  //         Divider(),
+  //         Expanded(child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Padding(
+  //               padding: const EdgeInsets.only(top: 8.0 , bottom: 8.0),
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text("My Ideas" , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
+  //                   InkWell(
+  //                       onTap: () async {
+  //                           EasyLoading.show();
+  //                           myIdeas = await Provider.of<DataProvider>(context , listen: false).getUsersIdeas(userProfile!.userId??"") ;
+  //                           setState(() {});
+  //                           EasyLoading.dismiss();
+  //                       },
+  //                       child: Padding(
+  //                         padding: const EdgeInsets.all(8.0),
+  //                         child: Icon(Icons.refresh),
+  //                       ))
+  //                 ],
+  //               ),
+  //             ),
+  //             if(myIdeas != null)
+  //               Center(child: Align(alignment: Alignment.center, child:
+  //               Column(
+  //                 children: List.generate(myIdeas!.length, (index) {
+  //                   final item =  myIdeas![index];
+  //                   return Card(
+  //                       child: ListTile(
+  //                         onTap: (){
+  //                         //   ideaDetails
+  //                           Navigator.pushNamed(
+  //                             context,
+  //                             '/ideaDetails',
+  //                             arguments: item,
+  //                           );
+  //                         },
+  //                           leading: Image.network("${item.image}" , width: size_W(25)
+  //                         , height: size_W(25), errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
+  //                             return Image.asset("assets/images/logo.png" ,width: size_W(25)
+  //                                 , height: size_W(25));
+  //                           } ,),
+  //                           title: Text("${item.title}" , style: ourTextStyle(fontSize: 15 , fontWeight: FontWeight.w600),),
+  //                           subtitle: Text("${item.description}" , style: ourTextStyle(),maxLines: 2,overflow: TextOverflow.ellipsis,),
+  //                            trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
+  //
+  //                       ));
+  //
+  //                 }),
+  //               )
+  //               )),
+  //             if(myIdeas == null)
+  //               Center(child: Text("There is no Data" , style: ourTextStyle(),)),
+  //           ],
+  //         ))
+  //       ],
+  //     ),
+  //   );
+  // }
 }

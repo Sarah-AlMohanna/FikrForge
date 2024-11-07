@@ -47,6 +47,7 @@ class Idea {
   final String? intellectualPropertyStatus;
   final String? userId;
   final String? uploadedAt;
+  final String? amount;
 
   Idea({
     this.title,
@@ -65,6 +66,7 @@ class Idea {
     this.supportingDocuments,
     this.intellectualPropertyStatus,
     this.userId,
+    this.amount,
     this.uploadedAt,
   });
 
@@ -81,10 +83,11 @@ class Idea {
     targetAudience: json["target_audience"],
     businessModel: json["business_model"],
     budgetMinimum: json["budget_minimum"],
-    budgetMaximum: json["budget maximum"],
+    budgetMaximum: json["budget_maximum"],
     supportingDocuments: json["supporting_documents"] == null ? [] : List<String>.from(json["supporting_documents"]!.map((x) => x)),
     intellectualPropertyStatus: json["intellectualPropertyStatus"],
     userId: json["user_id"],
+    amount: json["amount"],
     uploadedAt: json["uploadedAt"],
   );
 
@@ -92,7 +95,7 @@ class Idea {
     "title": title,
     "description": description,
     "image": image,
-    "status" :"pending",
+    "status" :"New",
     "uploaded_at": FieldValue.serverTimestamp(),
     "file": file,
     "additional_info": additionalInfo,
@@ -101,8 +104,9 @@ class Idea {
     "target_audience": targetAudience,
     "business_model": businessModel,
     "idea_id": idea_id,
+    "amount": amount,
     "budget_minimum": budgetMinimum,
-    "budget maximum": budgetMaximum,
+    "budget_maximum": budgetMaximum,
     "supporting_documents": supportingDocuments == null ? [] : List<dynamic>.from(supportingDocuments!.map((x) => x)),
     "intellectualPropertyStatus": intellectualPropertyStatus,
     "user_id": userId,

@@ -102,11 +102,13 @@ class _RegisteredSuccessfullyPageState extends State<RegisteredSuccessfullyPage>
       setState(() {
         step = step + 1 ;
       });
-    } else if(step == 3){
+    }
+    else if(step == 3){
       EasyLoading.show();
       await uploadBio();
       await Provider.of<UserProvider>(context, listen: false).loginUserBase(context, widget.userProfile?.email??"", widget.userProfile?.password??"");
-    } else if (step < 3) {
+    }
+    else if (step < 3) {
       setState(() {
         step = step + 1;
       });

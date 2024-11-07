@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:forgeapp/configuration/theme.dart';
+import 'package:forgeapp/screnns/home/profile_inventor.dart';
 import 'package:forgeapp/screnns/ideas/add_Idea.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,7 @@ import '../../models/IdeaModel.dart';
 import '../../models/user_profile_model.dart';
 import '../../provider/dataProvider.dart';
 import '../../provider/user_provider.dart';
+import 'all_projects_page_inventor.dart';
 import 'notificationsPage.dart';
 import 'searchPage.dart';
 
@@ -27,6 +29,8 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
   int pageSelected = 0 ;
   UserProfile? userProfile ;
   List<Idea>? myInvestmentIdeas  ;
+  bool menuShown = false ;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -50,6 +54,17 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+          onTap: (){
+            setState(() {
+              menuShown = !menuShown ;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.menu),
+          ),
+        ),
         iconTheme: IconThemeData( color: Theme_Information.Color_1),
         backgroundColor: Theme_Information.Primary_Color.withOpacity(0.8),
         title: Text(titleAppbar() , style: ourTextStyle(fontWeight: FontWeight.w600 , fontSize: 16 , color: Theme_Information.Color_1),),
@@ -60,6 +75,7 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
                 height: MediaQuery.of(context).size.height,
                 child: Row(
                   children: [
+                    if(menuShown)
                     Container(
                       width: 56,
                       color: Theme_Information.Primary_Color.withOpacity(0.8),
@@ -78,6 +94,10 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
                           buildContainerIcon(IconData: Icons.search ,isSelected: pageSelected == 2 , onTap: (){
                             setState(() {
                               pageSelected = 2 ;
+                            });
+                          }),  buildContainerIcon(IconData: Icons.account_circle ,isSelected: pageSelected == 3 , onTap: (){
+                            setState(() {
+                              pageSelected = 3 ;
                             });
                           }),
                           buildContainerIcon(IconData: Icons.logout ,isSelected: pageSelected == 4 , onTap: (){
@@ -113,6 +133,8 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
                         ],
                       ),
                     ),
+                    if(!menuShown)
+                      SizedBox(width: 1,),
                     Expanded(flex: 10, child: buildProfilePage(context))
                   ],
                 ),
@@ -126,6 +148,8 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
       return "Notifications Page" ;
     } else if(pageSelected == 2){
       return "Search User" ;
+    }  else if(pageSelected == 3){
+      return "Profile Page" ;
     } else {
       return "";
     }
@@ -134,17 +158,14 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
 
   Widget buildProfilePage(BuildContext context){
     if(pageSelected == 0){
-      return userProfile == null
-          ? SizedBox()
-          : ProfilePage(context);
-    }
-    else if(pageSelected == 1){
+      return AllProjectsPageInventor();
+    } else if(pageSelected == 1){
       return NotificationsPage();
     }else if(pageSelected == 2){
-      return userProfile == null
-          ? SizedBox()
-          : SearchPage();
-    }     else {
+      return  SearchPage();
+    } else if(pageSelected == 3){
+      return InventorProfilePage();
+    } else {
       return SizedBox();
     }
 
@@ -172,118 +193,7 @@ class _HomePageInvestorState extends State<HomePageInvestor> {
     );
   }
 
-  Widget ProfilePage(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // ClipRRect(
-              ClipOval(
-
-                // borderRadius: BorderRadius.circular(75.0),
-                child: Image.network(userProfile!.profileImage ??"" ,width: size_W(40)  , height: size_W(40) , fit: BoxFit.fill  ,  errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
-                  return Image.network("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" ,width: size_W(40)
-                      , height: size_W(40));
-                },),
-              ),
-              SizedBox(width: size_W(5),),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome ${userProfile!.fillName}", style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
-
-                    Text(userProfile!.bio??"" , style: ourTextStyle(),),
-                  ],
-                ),
-              ),
-              SizedBox(width: size_W(5),),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: (150),
-                  child: T9ButtonReverce(
-                    onPressed: (){
-                      Navigator.pushNamed(
-                        context,
-                        '/UpdateProfile',
-                        arguments: userProfile,
-                      ).then((value) async {
-                        if(value != null){
-                          EasyLoading.show();
-                          await Provider.of<UserProvider>(context , listen: false).getUserData(userProfile?.userId??"");
-                          userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
-                          myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"") ;
-                          setState(() {});
-                          EasyLoading.dismiss();
-                        }
-                      });
-                    },
-                      textContent:"Edit Profile")),
-              )
-            ],
-          ),
-          Divider(),
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0 , bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("My Investments" , style: ourTextStyle(fontSize: 16 , fontWeight: FontWeight.w600),),
-                    InkWell(
-                        onTap: () async {
-                            EasyLoading.show();
-                            myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"") ;
-                            setState(() {});
-                            EasyLoading.dismiss();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(Icons.refresh),
-                        ))
-                  ],
-                ),
-              ),
-              if(myInvestmentIdeas != null)
-                Center(child: Align(alignment: Alignment.center, child:
-                Column(
-                  children: List.generate(myInvestmentIdeas!.length, (index) {
-                    final item =  myInvestmentIdeas![index];
-                    return Card(
-                        child: ListTile(
-                          onTap: (){
-                          //   ideaDetails
-                            Navigator.pushNamed(
-                              context,
-                              '/ideaDetails',
-                              arguments: item,
-                            );
-                          },
-                            leading: Image.network("${item.image}" , width: size_W(25)
-                          , height: size_W(25), errorBuilder: (BuildContext? context, Object? exception, StackTrace? stackTrace) {
-                              return Image.asset("assets/images/logo.png" ,width: size_W(25)
-                                  , height: size_W(25));
-                            } ,),
-                            title: Text("${item.title}" , style: ourTextStyle(fontSize: 15 , fontWeight: FontWeight.w600),),
-                            subtitle: Text("${item.description}" , style: ourTextStyle(),maxLines: 2,overflow: TextOverflow.ellipsis,),
-                             // trailing: Text(item.status?.toUpperCase()??"" , style: ourTextStyle(),),
-
-                        ));
-
-                  }),
-                )
-                )),
-              if(myInvestmentIdeas == null)
-                Center(child: Text("There is no Data" , style: ourTextStyle(),)),
-            ],
-          ))
-        ],
-      ),
-    );
-  }
+  // Widget ProfilePage(BuildContext context) {
+  //   return ;
+  // }
 }
