@@ -62,9 +62,10 @@ class T9ButtonState extends State<T9Button> {
 
 class T9ButtonReverce extends StatefulWidget {
   var textContent;
+  Color? color;
   VoidCallback? onPressed;
 
-  T9ButtonReverce({@required this.textContent, this.onPressed});
+  T9ButtonReverce({@required this.textContent, this.onPressed, this.color});
 
   @override
   State<StatefulWidget> createState() {
@@ -84,7 +85,7 @@ class T9ButtonReverceState extends State<T9ButtonReverce> {
         //   begin: Alignment.topLeft,
         //   end: Alignment.bottomRight,
         // ),
-        color: Theme_Information.Primary_Color,
+        color: widget.color ?? Theme_Information.Primary_Color,
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: MaterialButton(

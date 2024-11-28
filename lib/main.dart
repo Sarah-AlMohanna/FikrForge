@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:forgeapp/provider/dataProvider.dart';
 import 'package:forgeapp/provider/user_provider.dart';
+import 'package:forgeapp/screnns/admin/adminHomePage.dart';
+import 'package:forgeapp/screnns/admin/ideaDetailsAdmin.dart';
+import 'package:forgeapp/screnns/admin/userDetailsAdmin.dart';
 import 'package:forgeapp/screnns/auth/login_screen.dart';
 import 'package:forgeapp/screnns/auth/register_screen.dart';
 import 'package:forgeapp/screnns/auth/registeredSuccessfullyPage.dart';
@@ -95,6 +98,7 @@ class _MyAppState extends State<MyApp> {
                 '/welcome': (context) => WelcomeScreen(),
                 '/login': (context) => LoginScreen(),
                 '/registration': (context) => RegistrationScreen(),
+                '/admin': (context) => AdminHomePage(),
                 '/homePage': (context) => HomePage(),
                 '/homePageEntrepreneur': (context) => HomePageEntrepreneur(),
                 '/homePageInvestor': (context) => HomePageInvestor(),
@@ -110,6 +114,10 @@ class _MyAppState extends State<MyApp> {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
                   return IdeaDetailsInvestorPage(item: item);
                 },
+                '/IdeaDetailsAdminPage': (context) {
+                  final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
+                  return IdeaDetailsAdminPage(item: item);
+                },
                 '/IdeaMoreDetailsPage': (context) {
                   final Idea item = ModalRoute.of(context)!.settings.arguments as Idea;
                   return IdeaMoreDetailsPage(item: item);
@@ -121,6 +129,10 @@ class _MyAppState extends State<MyApp> {
                 '/UserDetailsPage': (context) {
                   final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
                   return UserDetailsPage(userProfile: userProfile);
+                },
+                '/UserDetailsPageAdmin': (context) {
+                  final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;
+                  return UserDetailsAdminPage(userProfile: userProfile);
                 },
                 '/RegisteredSuccessfully': (context) {
                   final UserProfile userProfile = ModalRoute.of(context)!.settings.arguments as UserProfile;

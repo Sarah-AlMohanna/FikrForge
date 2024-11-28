@@ -49,9 +49,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   child: T9ButtonReverce(
                     onPressed: () async {
                       Navigator.pushReplacementNamed(context, '/login');
-
                     },
-                    textContent: "Click to start",
+                    textContent: "Click to Start",
                   ),
                 ),
               ],

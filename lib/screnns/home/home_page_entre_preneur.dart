@@ -200,11 +200,9 @@ class _HomePageEntrepreneurState extends State<HomePageEntrepreneur> {
     } else if(pageSelected == 4){
       return  EntrepreneurProfilePage();
     }
-
     else {
       return SizedBox();
     }
-
   }
 
   Widget buildContainerIcon({

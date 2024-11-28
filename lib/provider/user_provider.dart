@@ -13,14 +13,20 @@ import '../models/user_profile_model.dart';
 class UserProvider with ChangeNotifier{
   // notifyListeners();
   UserProfile? userProfile ;
+  Map<String, dynamic>? adminData ;
   setUserProfile(UserProfile data){
     userProfile = data ;
     notifyListeners();
   }
 
+  setAdminData(Map<String, dynamic> data){
+    adminData = data ;
+    notifyListeners();
+  }
+
   bool isInvestor = false ;
 
-  setIsInvestor (bool boolNew){
+  setIsInvestor(bool boolNew){
     isInvestor = boolNew  ;
     notifyListeners();
   }
@@ -31,6 +37,20 @@ class UserProvider with ChangeNotifier{
     EasyLoading.show();
 
     try {
+     int? isAdmin = await checkAdminUser(email , password);  /// 1- admin , 2- admin (wrong password) , 3- not admin
+     print("isAdmin_ ${isAdmin}");
+      if(isAdmin != null && isAdmin == 1){ /// 1- admin
+        print("Admin");
+
+        EasyLoading.dismiss();
+        Navigator.pushNamed(context, '/admin');
+
+        return ;
+      } else   if(isAdmin != null && isAdmin ==2 ){ /// 1- admin (wrong password)
+        print("Admin _ (wrong password)");
+        EasyLoading.showError("Password not correct");
+        return ;
+      }
       UserCredential userCredential = await loginUser(email, password);
 
       if (userCredential.user != null) {
@@ -86,21 +106,43 @@ class UserProvider with ChangeNotifier{
     }
   }
 
-  Future<Map<String, dynamic>?> getUserData(String uid , {bool justData = false}) async {
+  Future<Map<String, dynamic>?> getUserData(String uid,
+      {bool justData = false}) async {
     try {
-      var userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-      if(userDoc.data() == null){
-
+      var userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (userDoc.data() == null) {
         return null;
       }
-
       String jsonString = jsonEncode(userDoc.data());
-
       UserProfile userProfile = userProfileFromJson(jsonString);
-      if(!justData){
-        await  setUserProfile(userProfile);
+      if (!justData) {
+        await setUserProfile(userProfile);
       }
       return userDoc.data();
+    } catch (e) {
+      print("Error retrieving user data: $e");
+      throw e; // Throw the error to handle it in the UI
+    }
+  }
+
+  Future<int?> checkAdminUser(String email  , String password) async {
+    try {
+      var userDoc = await FirebaseFirestore.instance.collection('admin_users').get();
+      if (userDoc.docs.isNotEmpty) {
+        for (QueryDocumentSnapshot document in userDoc.docs) {
+          print("dddd__ ${document.data()}");
+          if(document["email"] == email){
+            if(document["password"] == password){
+              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+              await setAdminData(data);
+              return 1 ;
+            } else {
+              return 2 ;
+            }
+          }
+        }
+      }
     } catch (e) {
       print("Error retrieving user data: $e");
       throw e; // Throw the error to handle it in the UI

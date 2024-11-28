@@ -100,9 +100,16 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 width: size_W(180),
                 child: InkWell(
-                  onTap: (){
-                    // Navigator.push(context, MyCustomRoute(builder: (BuildContext context) => const RegistrationScreen()));
-                    // Navigator.pushNamed(context, '/registration');
+                  onTap: () async {
+                    if(userOrEmailController.text.isEmpty){
+                      EasyLoading.showError("Enter email");
+                      return ;
+                    }else {
+                      EasyLoading.show();
+                      await  FirebaseAuth.instance.sendPasswordResetEmail(email: userOrEmailController.text);
+                      EasyLoading.showError("Check your email to reset your password");
+
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -127,13 +134,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () async {
 
                       if(kDebugMode){
+                        /// admin
+                        // userOrEmailController.text = "admin@admin.com";
+                        // password.text = "Admin#123";
+
                         /// entrepreneur
                         // userOrEmailController.text = "user@user.com";
                         // password.text = "User#1234";
 
                         /// Investor
-                        userOrEmailController.text = "investhanoof@gmail.com";
-                        password.text = "HanoofInvest11\$";
+                        // userOrEmailController.text = "investhanoof@gmail.com";
+                        // password.text = "HanoofInvest11\$";
                         // userOrEmailController.text = "Abdulaziz@gmail.com";
                         // password.text = "Abdulaziz102@";
 

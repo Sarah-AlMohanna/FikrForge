@@ -52,8 +52,8 @@ class _AddIdeaPageState extends State<AddIdeaPage> {
   String? intellectualPropertyStatusSelected ;
 
 
-  double _minValue = 50;
-  double _maxValue = 10000;
+  double _minValue = 1000;
+  double _maxValue = 50000;
   double _currentMinValue = 2500;
   double _currentMaxValue = 7500;
 

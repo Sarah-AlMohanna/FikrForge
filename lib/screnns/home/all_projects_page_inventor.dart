@@ -39,7 +39,7 @@ class _AllProjectsPageInventorState extends State<AllProjectsPageInventor> {
       userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
       if(userProfile!.userId != null) {
         print("myInvestmentIdeas_ ${myInvestmentIdeas?.length}");
-        allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest(userProfile!.userId??"")??[] ;
+        allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest()??[] ;
         myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"")??[] ;
         allIdeasToInvest = [];
         // allIdeas!.forEach((element) async {
@@ -184,7 +184,7 @@ class _AllProjectsPageInventorState extends State<AllProjectsPageInventor> {
                                   userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
                                   if(userProfile!.userId != null) {
                                     print("myInvestmentIdeas_ ${myInvestmentIdeas?.length}");
-                                    allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest(userProfile!.userId??"")??[] ;
+                                    allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest()??[] ;
                                     myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"")??[] ;
                                     allIdeasToInvest = [];
                                     // allIdeas!.forEach((element) async {
@@ -345,7 +345,7 @@ class _AllProjectsPageInventorState extends State<AllProjectsPageInventor> {
                     userProfile = Provider.of<UserProvider>(context , listen: false).userProfile ;
                     if(userProfile!.userId != null) {
                       print("myInvestmentIdeas_ ${myInvestmentIdeas?.length}");
-                      allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest(userProfile!.userId??"")??[] ;
+                      allIdeas = await Provider.of<DataProvider>(context , listen: false).getAllIdeasToInvest()??[] ;
                       myInvestmentIdeas = await Provider.of<DataProvider>(context , listen: false).getInvestmentIdeas(userProfile!.userId??"")??[] ;
                       allIdeasToInvest = [];
                       // allIdeas!.forEach((element) async {

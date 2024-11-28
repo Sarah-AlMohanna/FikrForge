@@ -353,6 +353,8 @@ TextStyle ourTextStyleEnglish({Color? color, double? fontSize ,FontWeight?  font
   // return GoogleFonts.aBeeZee(color:  color ,fontWeight:  fontWeight, fontSize:  size_H(fontSize));
 }
 
+
+
 TextStyle ourTextStyle({Color? color, double? fontSize ,FontWeight?  fontWeight ,double?  height ,TextDecoration? decoration }){
   // color ??= Theme_Information.Primary_Color; ///  decoration: TextDecoration.underline,
   color ??= Colors.black;

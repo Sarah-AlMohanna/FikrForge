@@ -88,7 +88,7 @@ class Idea {
     intellectualPropertyStatus: json["intellectualPropertyStatus"],
     userId: json["user_id"],
     amount: json["amount"],
-    uploadedAt: json["uploadedAt"],
+    uploadedAt: "${json["uploaded_at"]}",
   );
 
   Map<String, dynamic> toJson() => {

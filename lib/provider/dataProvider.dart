@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,6 +40,97 @@ class DataProvider with ChangeNotifier{
       return null;
     }
   }
+
+  Future<void> deleteUserAndIdeas(String userId) async {
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+
+    CollectionReference usersRef = firestore.collection('users');
+    CollectionReference userIdeasRef = firestore.collection('user_ideas');
+    CollectionReference investIdeasRef = firestore.collection('invest_ideas');
+    CollectionReference userIdeasInvestRequestRef = firestore.collection('user_ideas_invest_request');
+    CollectionReference userNotificationsRef = firestore.collection('user_notifications');
+
+    WriteBatch batch = firestore.batch();
+
+    try {
+      var userIdeasQuery = await userIdeasRef.where('user_id', isEqualTo: userId).get();
+
+
+      if (userIdeasQuery.docs.isEmpty) {
+        print("No ideas found for user: $userId. Skipping idea deletion.");
+      } else {
+        for (var ideaDoc in userIdeasQuery.docs) {
+          String ideaId = ideaDoc.id;
+
+          var investIdeasQuery = await investIdeasRef.where(
+              'idea_id', isEqualTo: ideaId).get();
+          for (var doc in investIdeasQuery.docs) {
+            batch.delete(doc.reference); // Delete the document
+          }
+
+          var investRequestsQuery = await userIdeasInvestRequestRef.where(
+              'idea_id', isEqualTo: ideaId).get();
+          for (var doc in investRequestsQuery.docs) {
+            batch.delete(doc.reference); // Delete the document
+          }
+
+          var notificationsQuery = await userNotificationsRef.where(
+              'idea_id', isEqualTo: ideaId).get();
+          for (var doc in notificationsQuery.docs) {
+            batch.delete(doc.reference); // Delete the document
+          }
+
+          batch.delete(ideaDoc.reference);
+        }
+      }
+
+
+
+      var userDoc = await usersRef.doc(userId).get();
+      String jsonString = jsonEncode(userDoc.data());
+      UserProfile userProfile = userProfileFromJson(jsonString);
+      await deleteUser(
+          email: userProfile.email??"",
+          password: userProfile.password??"",
+      );
+
+      if (userDoc.exists) {
+        batch.delete(userDoc.reference); // Delete user document
+      } else {
+        throw Exception("User with id $userId does not exist.");
+      }
+
+      await batch.commit();
+      print("User and all associated ideas deleted successfully.");
+    } catch (e) {
+      print("Error deleting user and ideas: $e");
+    }
+
+
+
+
+  }
+
+  Future deleteUser({required String email,required String password}) async {
+    try {
+      final FirebaseAuth _auth = FirebaseAuth.instance;
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if(userCredential.user != null){
+        await userCredential.user!.delete();
+        return true;
+      }
+
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
 
   Future<bool?>? updateUserProfile(
       {required String uid,required String fullName,required String bio,required String profileImage}) async {
@@ -479,8 +571,32 @@ class DataProvider with ChangeNotifier{
     }
   }
 
+  Future getAllIdeas( List<Idea> _list ) async {
+    // List<Idea> _list = [] ;
+    // users
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<List<Idea>?> getAllIdeasToInvest(String userID) async {
+    try {
+      // QuerySnapshot querySnapshot = await firestore.collection("user_ideas").get();
+
+      QuerySnapshot querySnapshot = await firestore
+          .collection("user_ideas")
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (QueryDocumentSnapshot document in querySnapshot.docs) {
+
+          Idea data = Idea.fromJson(document.data() as Map<String, dynamic>);
+          _list.add(data);
+        }
+        return _list ;
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
+
+  Future<List<Idea>?> getAllIdeasToInvest() async {
     List<Idea> _list = [] ;
     // users
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -530,5 +646,46 @@ class DataProvider with ChangeNotifier{
     }
   }
 
+
+  Future<void> deleteIdeaFromAdmin(String ideaId) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    CollectionReference userIdeasRef = firestore.collection('user_ideas');
+    CollectionReference investIdeasRef = firestore.collection('invest_ideas');
+    CollectionReference userIdeasInvestRequestRef = firestore.collection('user_ideas_invest_request');
+    CollectionReference userNotificationsRef = firestore.collection('user_notifications');
+
+    WriteBatch batch = firestore.batch();
+
+    try {
+      var userIdeaDoc = await userIdeasRef.doc(ideaId).get();
+
+      if (!userIdeaDoc.exists) {
+        throw Exception("Idea with id $ideaId does not exist in user_ideas.");
+      }
+
+      var investIdeasQuery = await investIdeasRef.where('idea_id', isEqualTo: ideaId).get();
+      for (var doc in investIdeasQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      var investRequestsQuery = await userIdeasInvestRequestRef.where('idea_id', isEqualTo: ideaId).get();
+      for (var doc in investRequestsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      var notificationsQuery = await userNotificationsRef.where('idea_id', isEqualTo: ideaId).get();
+      for (var doc in notificationsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      batch.delete(userIdeasRef.doc(ideaId));
+
+      await batch.commit();
+      print("Idea and all references deleted successfully.");
+    } catch (e) {
+      print("Error deleting idea: $e");
+    }
+  }
 
 }
